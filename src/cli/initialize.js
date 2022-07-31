@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import chalk from 'chalk';
 import { Synchronizer } from './synchronize';
+import { api } from '../helpers/api';
 
 const ProjectInput = {
   type: 'input',
@@ -44,22 +45,25 @@ class Initializer {
   static async initialize() {
     const project = await getInputData(ProjectInput, 'project');
 
-    // check if project name has already been assigned - else create project
+    const { exists: projectExists } = await api.getProjectExists(project);
 
     const token = await getInputData(TokenInput, 'token');
 
     try {
+      if (!projectExists) {
+        const { success: initializeSuccess } = await api.initializeProject(project);
+        console.log('\n' + chalk.green('Successfully initialized project!') + '\n');
+      }
       fs.writeFileSync(path.join(process.cwd(), '.sync'), JSON.stringify({ project, token }));
+      console.log(
+        '\n' +
+          chalk.green('Successfully created .sync file! Be sure add it to your .gitignore!') +
+          '\n' +
+          chalk.underline(path.join(process.cwd(), '.gitignore') + '\n')
+      );
     } catch (e) {
       // handle file creation error and return message to user
     }
-
-    console.log(
-      '\n' +
-        chalk.green('Successfully created .sync file! Be sure add it to your .gitignore!') +
-        '\n' +
-        chalk.underline(path.join(process.cwd(), '.gitignore') + '\n')
-    );
 
     const sync = (await inquirer.prompt(SyncChoice))['sync'];
     if (sync) {

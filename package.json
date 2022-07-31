@@ -12,7 +12,9 @@
     "watch-run": "nodemon --exec npx babel-node src/index.js"
   },
   "dependencies": {
+    "centra": "^2.5.0",
     "chalk": "^4.0.0",
+    "crypto-js": "^4.1.1",
     "inquirer": "^7.1.0",
     "safe-merge-files": "^0.2.3"
   },
