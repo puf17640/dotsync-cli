@@ -1,11 +1,35 @@
-import { ChalkTest } from './ChalkTest';
-import { InquirerCli } from './cli';
+import { Initializer, Synchronizer } from './cli';
+import inquirer from 'inquirer';
 
-console.log('############## Running Chalk test #############');
-var chalkTest = new ChalkTest();
-chalkTest.test();
-console.log('################ Chalk test Done ##############');
+const CommandChoice = {
+  type: 'list',
+  name: 'command',
+  message: 'What do you want to do?',
+  choices: [
+    {
+      name: 'Sync my .env',
+      value: 'sync',
+    },
+    {
+      name: 'Initialize a project',
+      value: 'init',
+    },
+  ],
+};
 
-console.log('################ CLI Demo Begins ##############');
-var cli = new InquirerCli();
-cli.start();
+const requireCommand = () => {
+  inquirer.prompt(CommandChoice).then(({ command }) => {
+    switch (command) {
+      case 'sync':
+        Synchronizer.sync();
+        break;
+      case 'init':
+        Initializer.initialize();
+        break;
+      default:
+        process.exit(-1);
+    }
+  });
+};
+
+requireCommand();
